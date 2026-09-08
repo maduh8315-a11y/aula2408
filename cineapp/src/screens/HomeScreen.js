@@ -1,15 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator, Button } from 'react-native';
-import { buscarFilmes } from '../api'; // Importando nossa API simulada
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import { buscarFilmes } from '../api';
 
 export default function HomeScreen({ navigation }) {
   const [filmes, setFilmes] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // useEffect substitui o "OnCreate" para carregar dados iniciais
   useEffect(() => {
     async function carregarDados() {
-      const dados = await buscarFilmes(); // Consumo da API (Assíncrono)
+      const dados = await buscarFilmes();
       setFilmes(dados);
       setLoading(false);
     }
@@ -17,25 +16,29 @@ export default function HomeScreen({ navigation }) {
   }, []);
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#0000ff" style={{flex: 1}} />;
+    return <ActivityIndicator size="large" color="#6200ee" style={{ flex: 1 }} />;
   }
 
   return (
     <View style={styles.container}>
-      <Button title="Ver Meus Favoritos" onPress={() => navigation.navigate('Favorites')} />
-      
+      <TouchableOpacity
+        style={styles.botaoFavoritos}
+        onPress={() => navigation.navigate('Favorites')}
+      >
+        <Text style={styles.botaoFavoritosTexto}> Ver Meus Favoritos</Text>
+      </TouchableOpacity>
+
       <FlatList
         data={filmes}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <TouchableOpacity 
+          <TouchableOpacity
             style={styles.card}
-            // AQUI OCORRE A PASSAGEM DE PARÂMETROS
-            // Passamos o objeto inteiro 'item' para a próxima tela
             onPress={() => navigation.navigate('Details', { filme: item })}
           >
             <Text style={styles.titulo}>{item.titulo}</Text>
-            <Text style={styles.ano}>{item.ano}</Text>
+            <Text style={styles.ano}>{item.ano} • {item.genero}</Text>
+            <Text style={styles.duracao}>⏱ {item.duracao}</Text>
           </TouchableOpacity>
         )}
       />
@@ -45,7 +48,16 @@ export default function HomeScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: '#f0f0f0' },
+  botaoFavoritos: {
+    backgroundColor: '#6200ee',
+    paddingVertical: 12,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  botaoFavoritosTexto: { color: '#fff', fontWeight: 'bold', fontSize: 15 },
   card: { backgroundColor: '#fff', padding: 15, marginBottom: 10, borderRadius: 8, elevation: 2 },
   titulo: { fontSize: 18, fontWeight: 'bold' },
-  ano: { color: '#666' }
+  ano: { color: '#666', marginTop: 2 },
+  duracao: { color: '#999', fontSize: 12, marginTop: 4 },
 });
